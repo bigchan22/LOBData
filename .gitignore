@@ -1,0 +1,9 @@
+# DS store
+
+.DS_Store
+python/
+BestModel/
+*.txt
+*.npy
+*.csv
+*.pdf
