@@ -1,7 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[1]:
 
 
 import numpy as np
@@ -20,13 +16,9 @@ from source.Attention_LSTM import RNNModel
 from source.train import train_epoch_lstm,evaluate_lstm
 
 
-# In[2]:
-
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-
-# In[3]:
 
 
 # load array

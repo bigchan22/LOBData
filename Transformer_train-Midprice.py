@@ -162,16 +162,16 @@ with open(file_name, "a+") as file_object:
 
 
 import pickle
-with open("Val_loss_Trans_Mid", "wb") as fp:   #Pickling
+with open("Val_loss_Trans_Mid"+date_time, "wb") as fp:   #Pickling
     pickle.dump(Val_loss, fp)
     
-with open("Train_loss_Trans_Mid", "wb") as fp:   #Pickling
+with open("Train_loss_Trans_Mid"+date_time, "wb") as fp:   #Pickling
     pickle.dump(Train_loss, fp)
     
-with open("Accuracy_Trans_Mid", "wb") as fp:   #Pickling
+with open("Accuracy_Trans_Mid"+date_time, "wb") as fp:   #Pickling
     pickle.dump(Accuracy, fp)
     
-with open("F1_Trans_Mid", "wb") as fp:   #Pickling
+with open("F1_Trans_Mid"+date_time, "wb") as fp:   #Pickling
     pickle.dump(F1score, fp)
 
 

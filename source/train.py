@@ -32,7 +32,7 @@ def batchify(data, bsz,bptt,device):
     # 데이터셋을 bsz 파트들로 나눕니다.
     if(data.size(0)%(bsz*bptt)!=0):
 #        raise ValueError
-        print(data.size())
+#         print(data.size())
         if len(data.shape)>1:
             data = data.reshape(-1, bptt,data.size(1)).transpose(0,1).contiguous()
         else:

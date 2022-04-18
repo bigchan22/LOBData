@@ -9,7 +9,7 @@ from numpy import load
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-
+import argparse
 from timeit import default_timer as timer
 
 
@@ -19,9 +19,35 @@ from source.Data_load import Data_load
 from source.Attention_LSTM import RNNModel
 from source.train import train_epoch_lstm,evaluate_lstm
 
+parser = argparse.ArgumentParser(description='Train Config')
 
-# In[2]:
+parser.add_argument('--epoch',          type=int,   default=3000)
+parser.add_argument('--batch_size',     type=int,   default=128)
+parser.add_argument('--lr_initial',     type=float, default=1e-3)
+parser.add_argument('--hid_dim',     type=int, default=128)
+parser.add_argument('--emb_dim',     type=int, default=128)
+parser.add_argument('--num_layers',     type=int, default=4)
+parser.add_argument('--num_head',     type=int, default=8)
 
+args= parser.parse_args()
+
+print(args.epoch)
+print(args.batch_size)
+print(args.lr_initial)
+print(args.emb_dim)
+print(args.hid_dim)
+print(args.num_head)
+print(args.num_layers)
+
+num_epochs=args.epoch
+bptt = 39
+TGT_VOCAB_SIZE = 3
+EMB_SIZE = args.emb_dim
+NHEAD = args.num_head
+FFN_HID_DIM = args.hid_dim
+BATCH_SIZE = args.batch_size
+lr_init=args.lr_initial
+NUM_LAYERS = args.num_layers
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -107,7 +133,7 @@ loss_fn = torch.nn.CrossEntropyLoss()
 
 optimizer = torch.optim.Adam(lstm.parameters(), lr=1e-3, betas=(0.9, 0.98), eps=1e-9)
 
-NUM_EPOCHS = 4000
+NUM_EPOCHS = num_epochs
 best_val_loss=100000000
 for epoch in range(1, NUM_EPOCHS+1):
     start_time = timer()
@@ -136,7 +162,7 @@ date_time = now.strftime("%m_%d_%Y")
 # In[ ]:
 
 
-PATH='best_model_lstm_seq_'+date_time
+PATH='results/best_model_lstm_seq_'+date_time
 #     if featnorm==True:
 #         torch.save(best_model.state_dict(), PATH+'norm')
 #     else:
@@ -162,18 +188,18 @@ with open(file_name, "a+") as file_object:
 
 
 import pickle
-with open("Val_loss_LSTM_Mid", "wb") as fp:   #Pickling
+with open("results/Val_loss_LSTM_Mid"+date_time, "wb") as fp:   #Pickling
     pickle.dump(Val_loss, fp)
 
     
-with open("Train_loss_LSTM_Mid", "wb") as fp:   #Pickling
+with open("results/Train_loss_LSTM_Mid"+date_time, "wb") as fp:   #Pickling
     pickle.dump(Train_loss, fp)
 
     
-with open("Accuracy_LSTM_Mid", "wb") as fp:   #Pickling
+with open("results/Accuracy_LSTM_Mid"+date_time, "wb") as fp:   #Pickling
     pickle.dump(Accuracy, fp)
 
     
-with open("F1_LSTM_Mid", "wb") as fp:   #Pickling
+with open("results/F1_LSTM_Mid", "wb") as fp:   #Pickling
     pickle.dump(F1score, fp)
 
