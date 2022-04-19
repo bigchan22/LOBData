@@ -23,7 +23,7 @@ parser = argparse.ArgumentParser(description='Train Config')
 
 
 parser.add_argument('--model', type=str)
-parser.add_argument('--epoch', type=int, default=3000)
+parser.add_argument('--epoch', type=int, default=1000)
 parser.add_argument('--batch_size', type=int, default=128)
 parser.add_argument('--lr_initial', type=float, default=1e-3)
 parser.add_argument('--hid_dim', type=int, default=128)
