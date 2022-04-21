@@ -96,7 +96,7 @@ Ytest_data=Ytest_data.view(-1)
 
 torch.manual_seed(0)
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+device = torch.device("cuda:1" if torch.cuda.is_available() else "cpu")
 SRC_VOCAB_SIZE = Xtrain_data.shape[1]
 
 

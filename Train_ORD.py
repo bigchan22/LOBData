@@ -34,6 +34,8 @@ parser.add_argument('--mbr_no', type=int, default=None)
 parser.add_argument('--brn_no', type=int, default=None)
 parser.add_argument('--data', type=str, default=None)
 parser.add_argument('--trainname', type=str, default=None)
+parser.add_argument('--device', type = str, default=None)
+
 
 args = parser.parse_args()
 
@@ -62,6 +64,7 @@ else:
     now.strftime("%m/%d/%Y, %H:%M:%S")
     date_time = now.strftime("%m_%d_%Y")
     trainname = date_time
+device=args.device
 
 num_epochs = args.epoch
 bptt = 39
@@ -127,8 +130,9 @@ for mbr, brn in mbrnlist:
     Ytest_data = Ytest_data.view(-1)
 
     torch.manual_seed(0)
-
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    
+    if device == None:
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     SRC_VOCAB_SIZE = Xtrain_data.shape[1]
 
     if modeltype=='Trans':
