@@ -3,6 +3,8 @@ import torch
 import torch.nn as nn
 from torch import Tensor
 from torch.nn import TransformerEncoder, TransformerEncoderLayer, Transformer
+
+
 # helper Module that adds positional encoding to the token embedding to introduce a notion of word order.
 class PositionalEncoding(nn.Module):
     def __init__(self,
@@ -10,7 +12,7 @@ class PositionalEncoding(nn.Module):
                  dropout: float,
                  maxlen: int = 5000):
         super(PositionalEncoding, self).__init__()
-        den = torch.exp(- torch.arange(0, emb_size, 2)* math.log(10000) / emb_size)
+        den = torch.exp(- torch.arange(0, emb_size, 2) * math.log(10000) / emb_size)
         pos = torch.arange(0, maxlen).reshape(maxlen, 1)
         pos_embedding = torch.zeros((maxlen, emb_size))
         pos_embedding[:, 0::2] = torch.sin(pos * den)
@@ -23,6 +25,7 @@ class PositionalEncoding(nn.Module):
     def forward(self, token_embedding: Tensor):
         return self.dropout(token_embedding + self.pos_embedding[:token_embedding.size(0), :])
 
+
 # helper Module to convert tensor of input indices into corresponding tensor of token embeddings
 class TokenEmbedding(nn.Module):
     def __init__(self, vocab_size: int, emb_size):
@@ -32,6 +35,7 @@ class TokenEmbedding(nn.Module):
 
     def forward(self, tokens: Tensor):
         return self.embedding(tokens.long()) * math.sqrt(self.emb_size)
+
 
 # Seq2Seq Network
 class Seq2SeqTransformer(nn.Module):
@@ -59,14 +63,16 @@ class Seq2SeqTransformer(nn.Module):
         self.positional_encoding = PositionalEncoding(
             emb_size, dropout=dropout)
 
-
     def forward(self,
                 src: Tensor,
                 trg: Tensor,
                 src_mask: Tensor,
-                tgt_mask: Tensor,
-                memory_mask: Tensor):
+                tgt_mask: Tensor):
+        #,
+                # memory_mask: Tensor):
         src_emb = self.positional_encoding(self.src_tok_emb(src))
         tgt_emb = self.positional_encoding(self.tgt_tok_emb(trg).squeeze())
-        outs = self.transformer(src_emb, tgt_emb, src_mask, tgt_mask,memory_mask=memory_mask)
+        # outs = self.transformer(src_emb, tgt_emb, src_mask, tgt_mask, memory_mask=memory_mask)
+        outs = self.transformer(src_emb, tgt_emb, src_mask, tgt_mask, memory_mask=src_mask)
+        # outs = self.transformer(src_emb, tgt_emb, src_mask, tgt_mask)
         return self.generator(outs)
