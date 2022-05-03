@@ -65,7 +65,7 @@ def batchify(data, bsz, bptt, device):
 def batchify_with_padding(data, bsz, bptt, device):
     # 데이터셋을 bsz 파트들로 나눕니다.
 
-    if (data.size(0) % (bsz * bptt) != 0):
+    if data.size(0) % (bsz * bptt) != 0:
         if len(data.shape) > 1:
             data = data.reshape(-1, bptt, data.size(1)).transpose(0, 1).contiguous()
             padtensor = torch.ones((1, data.size(1), data.size(2)))
@@ -130,7 +130,7 @@ def train_epoch(model, optimizer, Xtrain_data, Ytrain_data, loss_fn, device, BAT
         # print("tgt input shape", tgt_input.shape)
         src_mask, tgt_mask, mmr_mask = create_mask(src_input, tgt_input, device)
         # logits = model(src_input, tgt_input, src_mask, tgt_mask, mmr_mask)
-        logits = model(src_input, tgt_input, src_mask, tgt_mask)
+        logits = model(src_input, tgt_input, src_mask, tgt_mask,src_mask)
 
         optimizer.zero_grad()
 
@@ -255,11 +255,11 @@ def evaluate(model, Xtest_data, Ytest_data, loss_fn, device, BATCH_SIZE, bptt):
             tgt_input = tgt[:-1]
             #             print(src_input.size())
             #             print(tgt_input.size())
-            src_mask, tgt_mask, mmr_mask = create_mask(src_input, tgt_input, device)
+            src_mask, tgt_mask, _ = create_mask(src_input, tgt_input, device)
 
             #             logits = model(src_input, tgt_input, src_mask, tgt_mask,src_padding_mask, tgt_padding_mask, src_padding_mask)
             # logits = model(src_input, tgt_input, src_mask, tgt_mask, mmr_mask)
-            logits = model(src_input, tgt_input, src_mask, tgt_mask)
+            logits = model(src_input, tgt_input, src_mask, tgt_mask, src_mask)
 
             tgt_out = tgt[1:]
 

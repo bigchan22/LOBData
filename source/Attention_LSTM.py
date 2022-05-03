@@ -3,27 +3,29 @@ from torch.autograd import Variable
 import torch.nn as nn
 import numpy as np
 
+
 def batch_matmul(seq, weight, nonlinearity=''):
     s = None
     for i in range(seq.size(0)):
         _s = torch.mm(seq[i], weight)
-        if(nonlinearity=='tanh'):
+        if (nonlinearity == 'tanh'):
             _s = torch.tanh(_s)
         _s = _s.unsqueeze(0)
-        if(s is None):
+        if (s is None):
             s = _s
         else:
-            s = torch.cat((s,_s),0)
+            s = torch.cat((s, _s), 0)
     return s.squeeze()
+
 
 class RNNModel(nn.Module):
     """Container module with an encoder, a recurrent module, and a decoder."""
 
-    def __init__(self, rnn_type, ntoken, ninp, nhid, nlayers,proj_size, dropout=0.5, tie_weights=False, attention=True,
+    def __init__(self, rnn_type, ntoken, ninp, nhid, nlayers, proj_size, dropout=0.5, tie_weights=False, attention=True,
                  attention_width=3, cuda=True):
         super(RNNModel, self).__init__()
         self.drop = nn.Dropout(dropout)
-#         self.encoder = nn.Embedding(ntoken, ninp)
+        #         self.encoder = nn.Embedding(ntoken, ninp)
         self.encoder = nn.Linear(ntoken, ninp)
         if rnn_type in ['LSTM', 'GRU']:
             self.rnn = getattr(nn, rnn_type)(ninp, nhid, nlayers, dropout=dropout)
@@ -45,7 +47,7 @@ class RNNModel(nn.Module):
 
         self.softmax = nn.Softmax()
         if attention:
-            self.AttentionLayer = AttentionLayer(cuda,nhid)
+            self.AttentionLayer = AttentionLayer(cuda, nhid)
         self.init_weights()
 
         self.rnn_type = rnn_type
@@ -54,6 +56,7 @@ class RNNModel(nn.Module):
         self.attention = attention
         self.attention_width = attention_width
         self.generator = nn.Linear(nhid, proj_size)
+
     def init_weights(self):
         initrange = 0.1
         self.encoder.weight.data.uniform_(-initrange, initrange)
@@ -61,19 +64,20 @@ class RNNModel(nn.Module):
         self.decoder.weight.data.uniform_(-initrange, initrange)
 
     def forward(self, input):
-        #print("input size:",input.size())
-#         emb = self.drop(self.encoder(input))
-        emb=self.encoder(input)
-        #print("emb size:",emb.size())
+        # print("input size:",input.size())
+        #         emb = self.drop(self.encoder(input))
+        emb = self.encoder(input)
+        # print("emb size:",emb.size())
         output, _ = self.rnn(emb)
-        #print("rnn output",output.size())
+        # print("rnn output",output.size())
         if self.attention:
             output = self.AttentionLayer.forward(output, self.attention_width)
         return self.generator(output)
         #
-#         output = self.drop(output)
-#         decoded = self.decoder(output.view(output.size(0) * output.size(1), output.size(2)))
-#         return decoded.view(output.size(0), output.size(1), decoded.size(1)), hidden
+
+    #         output = self.drop(output)
+    #         decoded = self.decoder(output.view(output.size(0) * output.size(1), output.size(2)))
+    #         return decoded.view(output.size(0), output.size(1), decoded.size(1)), hidden
 
     def init_hidden(self, bsz):
         weight = next(self.parameters()).data
@@ -90,23 +94,23 @@ class AttentionLayer(nn.Module):
     def __init__(self, cuda, nhid):
         super(AttentionLayer, self).__init__()
         self.nhid = nhid
-        self.weight_W = nn.Parameter(torch.Tensor(nhid,nhid))
+        self.weight_W = nn.Parameter(torch.Tensor(nhid, nhid))
         self.weight_proj = nn.Parameter(torch.Tensor(nhid, 1))
         self.softmax = nn.Softmax()
         self.weight_W.data.uniform_(-0.1, 0.1)
-        self.weight_proj.data.uniform_(-0.1,0.1)
+        self.weight_proj.data.uniform_(-0.1, 0.1)
         self.cuda = cuda
 
     def forward(self, inputs, attention_width=3):
         results = None
         for i in range(inputs.size(0)):
-            if(i<attention_width):
+            if i < attention_width:
                 output = inputs[i]
                 output = output.unsqueeze(0)
 
             else:
                 lb = i - attention_width
-                if(lb<0):
+                if lb < 0:
                     lb = 0
                 selector = torch.from_numpy(np.array(np.arange(lb, i)))
                 if self.cuda:
@@ -123,17 +127,17 @@ class AttentionLayer(nn.Module):
                     a_i = a[i].unsqueeze(1).expand_as(h_i)
                     h_i = a_i * h_i
                     h_i = h_i.unsqueeze(0)
-                    if(output is None):
+                    if output is None:
                         output = h_i
                     else:
-                        output = torch.cat((output,h_i),0)
-                output = torch.sum(output,0)
+                        output = torch.cat((output, h_i), 0)
+                output = torch.sum(output, 0)
                 output = output.unsqueeze(0)
 
-            if(results is None):
+            if results is None:
                 results = output
 
             else:
-                results = torch.cat((results,output),0)
+                results = torch.cat((results, output), 0)
 
         return results

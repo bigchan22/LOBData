@@ -2,8 +2,6 @@
 # coding: utf-8
 
 
-
-
 import numpy as np
 from numpy import load
 import torch
@@ -17,10 +15,9 @@ from datetime import datetime
 from source.transformer import Seq2SeqTransformer
 from source.train import train_epoch, evaluate
 from source.Attention_LSTM import RNNModel
-from source.train import train_epoch_lstm,evaluate_lstm
+from source.train import train_epoch_lstm, evaluate_lstm
 
 parser = argparse.ArgumentParser(description='Train Config')
-
 
 parser.add_argument('--model', type=str)
 parser.add_argument('--epoch', type=int, default=1000)
@@ -34,8 +31,7 @@ parser.add_argument('--mbr_no', type=int, default=None)
 parser.add_argument('--brn_no', type=int, default=None)
 parser.add_argument('--data', type=str, default=None)
 parser.add_argument('--trainname', type=str, default=None)
-parser.add_argument('--device', type = str, default=None)
-
+parser.add_argument('--device', type=str, default=None)
 
 args = parser.parse_args()
 
@@ -50,7 +46,6 @@ print(args.num_layers)
 print(args.mbr_no)
 print(args.brn_no)
 
-
 modeltype = args.model
 if modeltype not in ['Trans', 'ALSTM', 'LSTM']:
     raise ValueError
@@ -64,7 +59,7 @@ else:
     now.strftime("%m/%d/%Y, %H:%M:%S")
     date_time = now.strftime("%m_%d_%Y")
     trainname = date_time
-device=args.device
+device = args.device
 
 num_epochs = args.epoch
 bptt = 39
@@ -104,11 +99,16 @@ for mbr, brn in mbrnlist:
     Ytest_data = []
 
     for idx in range(len(XData) // 39):
-        if (np.isinf(XData[39 * idx:39 * (idx + 1)][:, :].tolist()).any()):
+        if np.isinf(XData[39 * idx:39 * (idx + 1)][:, :].tolist()).any():
             print(np.isinf(XData[39 * idx:39 * (idx + 1)][:, :].tolist()).any())
+            print(mbr, brn)
+            print(XDataname)
+            print(XData[39 * idx:39 * (idx + 1)][:, :].tolist())
+            raise RuntimeError
             continue
-        if (np.isinf(YData[39 * idx:39 * (idx + 1)][:].tolist()).any()):
+        if np.isinf(YData[39 * idx:39 * (idx + 1)][:].tolist()).any():
             print(np.isinf(YData[39 * idx:39 * (idx + 1)].tolist()).any())
+            raise RuntimeError
             continue
         if idx < (len(XData) // 39) * 0.9:
             Xtrain_data.append(XData[39 * idx:39 * (idx + 1)][:, :-1].tolist())
@@ -130,22 +130,22 @@ for mbr, brn in mbrnlist:
     Ytest_data = Ytest_data.view(-1)
 
     torch.manual_seed(0)
-    
+
     if device == None:
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     SRC_VOCAB_SIZE = Xtrain_data.shape[1]
 
-    if modeltype=='Trans':
+    if modeltype == 'Trans':
         model = Seq2SeqTransformer(NUM_ENCODER_LAYERS, NUM_DECODER_LAYERS, EMB_SIZE,
-                                     NHEAD, SRC_VOCAB_SIZE, TGT_VOCAB_SIZE, FFN_HID_DIM)
-    if modeltype=="ALSTM":
-        model = RNNModel(rnn_type='LSTM',ntoken=SRC_VOCAB_SIZE,ninp=EMB_SIZE,nhid=FFN_HID_DIM,nlayers=NUM_LAYERS,proj_size=TGT_VOCAB_SIZE,
-                    attention_width=39)
-    if modeltype=="LSTM":
+                                   NHEAD, SRC_VOCAB_SIZE, TGT_VOCAB_SIZE, FFN_HID_DIM)
+    if modeltype == "ALSTM":
         model = RNNModel(rnn_type='LSTM', ntoken=SRC_VOCAB_SIZE, ninp=EMB_SIZE, nhid=FFN_HID_DIM, nlayers=NUM_LAYERS,
-                 proj_size=TGT_VOCAB_SIZE,
-                 attention=False)
-
+                         proj_size=TGT_VOCAB_SIZE,
+                         attention_width=39)
+    if modeltype == "LSTM":
+        model = RNNModel(rnn_type='LSTM', ntoken=SRC_VOCAB_SIZE, ninp=EMB_SIZE, nhid=FFN_HID_DIM, nlayers=NUM_LAYERS,
+                         proj_size=TGT_VOCAB_SIZE,
+                         attention=False)
 
     summary = SummaryWriter()
     for p in model.parameters():
@@ -173,7 +173,7 @@ for mbr, brn in mbrnlist:
         end_time = timer()
         if modeltype == 'Trans':
             val_loss, acc, prec, reca, f1sc, confusion = evaluate(model, Xtest_data, Ytest_data, loss_fn, device,
-                                                              BATCH_SIZE, bptt)
+                                                                  BATCH_SIZE, bptt)
         else:
             val_loss, acc, prec, reca, f1sc, confusion = evaluate_lstm(model, Xtest_data, Ytest_data, loss_fn, device,
                                                                        BATCH_SIZE, bptt)
@@ -192,10 +192,10 @@ for mbr, brn in mbrnlist:
         Accuracy.append(acc)
         F1score.append(f1sc)
 
-    PATH = 'results/best_model_'+modeltype+'_' + str(mbr) + '_' + str(brn) + trainname
+    PATH = 'results/best_model_' + modeltype + '_' + str(mbr) + '_' + str(brn) + trainname
     torch.save(best_model.state_dict(), PATH)
 
-    file_name = 'results/result_'+modeltype+'_'  + str(mbr) + '_' + str(brn) + trainname + '.txt'
+    file_name = 'results/result_' + modeltype + '_' + str(mbr) + '_' + str(brn) + trainname + '.txt'
     text_to_append = PATH + '\t' + "Acc:" + str(best_acc) + '\t' + "prec:" + str(best_prec) + '\t' + "recall:" + str(
         best_reca) + '\t' + "f1sc:" + str(best_f1sc)
     print(text_to_append)
@@ -210,12 +210,11 @@ for mbr, brn in mbrnlist:
         # Append text at the end of file
         file_object.write(text_to_append)
 
-
-    with open("results/Val_loss_"+modeltype+'_'  + str(mbr) + '_' + str(brn) + trainname, "wb") as fp:  # Pickling
+    with open("results/Val_loss_" + modeltype + '_' + str(mbr) + '_' + str(brn) + trainname, "wb") as fp:  # Pickling
         pickle.dump(Val_loss, fp)
-    with open("results/Train_loss_"+modeltype+'_'  + str(mbr) + '_' + str(brn) + trainname, "wb") as fp:  # Pickling
+    with open("results/Train_loss_" + modeltype + '_' + str(mbr) + '_' + str(brn) + trainname, "wb") as fp:  # Pickling
         pickle.dump(Train_loss, fp)
-    with open("results/Accuracy_"+modeltype+'_'  + str(mbr) + '_' + str(brn) + trainname, "wb") as fp:  # Pickling
+    with open("results/Accuracy_" + modeltype + '_' + str(mbr) + '_' + str(brn) + trainname, "wb") as fp:  # Pickling
         pickle.dump(Accuracy, fp)
-    with open("results/F1_"+modeltype+'_'  + str(mbr) + '_' + str(brn) + trainname, "wb") as fp:  # Pickling
+    with open("results/F1_" + modeltype + '_' + str(mbr) + '_' + str(brn) + trainname, "wb") as fp:  # Pickling
         pickle.dump(F1score, fp)

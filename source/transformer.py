@@ -46,7 +46,7 @@ class Seq2SeqTransformer(nn.Module):
                  nhead: int,
                  src_vocab_size: int,
                  tgt_vocab_size: int,
-                 dim_feedforward: int = 512,
+                 dim_feedforward: int = 128,
                  dropout: float = 0.1):
         super(Seq2SeqTransformer, self).__init__()
         self.transformer = Transformer(d_model=emb_size,
@@ -67,12 +67,11 @@ class Seq2SeqTransformer(nn.Module):
                 src: Tensor,
                 trg: Tensor,
                 src_mask: Tensor,
-                tgt_mask: Tensor):
-        #,
-                # memory_mask: Tensor):
+                tgt_mask: Tensor,
+                memory_mask: Tensor):
         src_emb = self.positional_encoding(self.src_tok_emb(src))
         tgt_emb = self.positional_encoding(self.tgt_tok_emb(trg).squeeze())
-        # outs = self.transformer(src_emb, tgt_emb, src_mask, tgt_mask, memory_mask=memory_mask)
-        outs = self.transformer(src_emb, tgt_emb, src_mask, tgt_mask, memory_mask=src_mask)
+        outs = self.transformer(src_emb, tgt_emb, src_mask, tgt_mask, memory_mask=memory_mask)
+        # outs = self.transformer(src_emb, tgt_emb, src_mask, tgt_mask, memory_mask=src_mask)
         # outs = self.transformer(src_emb, tgt_emb, src_mask, tgt_mask)
         return self.generator(outs)
