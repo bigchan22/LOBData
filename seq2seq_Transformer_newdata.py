@@ -27,7 +27,7 @@ import math
 # In[2]:
 
 
-DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+DEVICE = torch.device('cuda:1' if torch.cuda.is_available() else 'cpu')
 
 
 # helper Module that adds positional encoding to the token embedding to introduce a notion of word order.
@@ -135,7 +135,7 @@ def create_mask(src, tgt):
 # In[4]:
 
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+device = torch.device("cuda:1" if torch.cuda.is_available() else "cpu")
 
 
 def batchify(data, bsz, bptt):
@@ -535,10 +535,10 @@ for MBR_NO, BRN_NO in mbrnlist:
     date_time = now.strftime("%m_%d_%Y")
 
     PATH = 'best_model_Trans_seq_' + date_time + '_' + str(MBR_NO) + '_' + str(BRN_NO)
-    if featnorm == True:
-        torch.save(best_model.state_dict(), PATH + 'norm')
-    else:
-        torch.save(best_model.state_dict(), PATH)
+    # if featnorm == True:
+    #     torch.save(best_model.state_dict(), PATH + 'norm')
+    # else:
+    #     torch.save(best_model.state_dict(), PATH)
     if featnorm == True:
         file_name = 'result_Trans_' + date_time + '_norm.txt'
     else:

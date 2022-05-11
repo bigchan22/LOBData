@@ -72,6 +72,4 @@ class Seq2SeqTransformer(nn.Module):
         src_emb = self.positional_encoding(self.src_tok_emb(src))
         tgt_emb = self.positional_encoding(self.tgt_tok_emb(trg).squeeze())
         outs = self.transformer(src_emb, tgt_emb, src_mask, tgt_mask, memory_mask=memory_mask)
-        # outs = self.transformer(src_emb, tgt_emb, src_mask, tgt_mask, memory_mask=src_mask)
-        # outs = self.transformer(src_emb, tgt_emb, src_mask, tgt_mask)
         return self.generator(outs)
