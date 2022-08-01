@@ -16,6 +16,7 @@ from source.transformer import Seq2SeqTransformer
 from source.train import train_epoch, evaluate
 from source.Attention_LSTM import RNNModel
 from source.train import train_epoch_lstm, evaluate_lstm
+from DataInfo import * 
 
 parser = argparse.ArgumentParser(description='Train Config')
 
@@ -72,15 +73,7 @@ lr_init = args.lr_initial
 NUM_ENCODER_LAYERS = args.num_layers // 2
 NUM_DECODER_LAYERS = args.num_layers // 2
 NUM_LAYERS = args.num_layers
-mbrnlist = [(5, 194), (2, 155), (12, 100), (17, 29),
-            (42, 1),
-            (44, 1),
-            (50, 92),
-            (2, 83),
-            (4, 10118),
-            (8, 298),
-            (4, 9997),
-            (50, 91)]
+mbrnlist = MBRN_sum_top
 if args.mbr_no:
     mbrnlist = [(args.mbr_no, args.brn_no)]
 print(mbrnlist)
@@ -89,8 +82,8 @@ for mbr, brn in mbrnlist:
     DataSubfix = str(mbr) + '_' + str(brn) + datasubfix
     XDataname = 'Train_ORD' + '_' + DataSubfix + '.npy'
     YDataname = 'Train_ORD_Label_' + '_' + DataSubfix + '.npy'
-    XData = load('./TrainData/' + XDataname)
-    YData = load('./TrainData/' + YDataname)
+    XData = load('/Data/LOBData/TrainData/' + XDataname)
+    YData = load('/Data/LOBData/TrainData/' + YDataname)
     Xdata = []
     Ydata = []
     Xtrain_data = []

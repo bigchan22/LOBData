@@ -43,9 +43,9 @@ def RawDataCollection(path_dir,datalist=[],**kwargs):
     return df    
 def SaveCollectedData(path_dir,datalist=[],**kwargs):
     collected_df=RawDataCollection(path_dir,datalist=datalist,**kwargs)
-    SaveDirPath='/Data/Min/TransLOB/CollectedData/'
+    SaveDirPath='/Data/LOBData/CollectedRawData'
     now=datetime.now()
-    filename=str(now.year)+'_'+str(now.month)+'_'+str(now.day)+'_'+str(now.hour)+'_'+str(now.minute)+'.csv'
+    filename=str(datalist[0])+'_'+str(now.month)+'_'+str(now.day)+'_'+str(now.hour)+'_'+str(now.minute)+'.csv'
     print(SaveDirPath+filename)
     collected_df.to_csv(SaveDirPath+filename)
     with open(SaveDirPath+'DataInformation.txt', "a+") as f:
