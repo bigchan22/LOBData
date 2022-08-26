@@ -41,11 +41,11 @@ def RawDataCollection(path_dir,datalist=[],**kwargs):
             newdf=newdf[newdf[str(key)].isin(value)]  
         df=pd.concat([df, newdf], axis=0)
     return df    
-def SaveCollectedData(path_dir,datalist=[],**kwargs):
+def SaveCollectedData(path_dir,datalist=[],SaveDirPath='/Data/LOBData/CollectedRawData',**kwargs):
     collected_df=RawDataCollection(path_dir,datalist=datalist,**kwargs)
-    SaveDirPath='/Data/LOBData/CollectedRawData'
+    SaveDirPath=SaveDirPath
     now=datetime.now()
-    filename=str(datalist[0])+'_'+str(now.month)+'_'+str(now.day)+'_'+str(now.hour)+'_'+str(now.minute)+'.csv'
+    filename=str(datalist[0])+'.csv'
     print(SaveDirPath+filename)
     collected_df.to_csv(SaveDirPath+filename)
     with open(SaveDirPath+'DataInformation.txt', "a+") as f:
