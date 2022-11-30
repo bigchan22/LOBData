@@ -74,9 +74,21 @@ NUM_ENCODER_LAYERS = args.num_layers // 2
 NUM_DECODER_LAYERS = args.num_layers // 2
 NUM_LAYERS = args.num_layers
 mbrnlist = MBRN_sum_top
+mbrnlist =[(25,  1093),
+            (12,   100),
+            (17,    29),
+            (44,     1),
+            (42,     1),
+            ( 2,   155),
+            ( 2,    83),
+            ( 4,  9997),
+            (56, 17990),
+            ( 5,   194)]
 if args.mbr_no:
     mbrnlist = [(args.mbr_no, args.brn_no)]
+mbrnlist=[(42,1)]
 print(mbrnlist)
+
 # load array
 for mbr, brn in mbrnlist:
     DataSubfix = str(mbr) + '_' + str(brn) + datasubfix

@@ -124,18 +124,24 @@ def train_epoch(model, optimizer, Xtrain_data, Ytrain_data, loss_fn, device, BAT
         tgt = batchify_with_padding(targets, BATCH_SIZE, bptt, device)
         # print(tgt)
         src_input = src[:]
-        # print("src shape", src.shape)
-        # print("tgt shape", tgt.shape)
+#         print("src shape", src.shape)
+#         print("tgt shape", tgt.shape)
         tgt_input = tgt[:-1]
         # print("tgt input shape", tgt_input.shape)
         src_mask, tgt_mask, mmr_mask = create_mask(src_input, tgt_input, device)
         # logits = model(src_input, tgt_input, src_mask, tgt_mask, mmr_mask)
+
         logits = model(src_input, tgt_input, src_mask, tgt_mask,src_mask)
 
         optimizer.zero_grad()
 
         tgt_out = tgt[1:]
-        # print("tgt output shape", tgt_out.shape)
+        print("src in shape", src_input.shape)
+        print("tgt in shape", tgt_input.shape)
+        print("src shape", src_mask.shape)
+        print("tgt shape", tgt_mask.shape)
+        print("tgt output shape", tgt_out.shape)
+        print("logit shape", logits.shape)
         loss = loss_fn(logits.reshape(-1, logits.shape[-1]), tgt_out.reshape(-1))
         loss.backward()
 

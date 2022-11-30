@@ -11,6 +11,20 @@ header_df=['ISU_CD', 'ORD_DD', 'ORD_ACPT_NO', 'REGUL_OFFHR_TP_CD', 'BLKTRD_TP_CD
        '호가체결접수순서번호', '직전체결가격', '누적체결수량', '누적거래대금', 'AGG_TM', '시가', '고가', '저가',
        'ORGN_ORD_ACPT_NO', '시장구분코드', '자동취소처리구분코드', 'MKTSTAT_TP_CD', '매도10단계호가합계잔량',
        '매수10단계호가합계잔량', 'PT_TP_CD']
+env_columns = ['REGUL_OFFHR_TP_CD',
+               'ASK_STEP1_BSTORD_PRC',
+               'ASK_STEP1_BSTORD_RQTY', 'ASK_STEP2_BSTORD_PRC', 'ASK_STEP2_BSTORD_RQTY', 'ASK_STEP3_BSTORD_PRC',
+               'ASK_STEP3_BSTORD_RQTY', 'ASK_STEP4_BSTORD_PRC', 'ASK_STEP4_BSTORD_RQTY', 'ASK_STEP5_BSTORD_PRC',
+               'ASK_STEP5_BSTORD_RQTY',
+               'BID_STEP1_BSTORD_PRC', 'BID_STEP1_BSTORD_RQTY', 'BID_STEP2_BSTORD_PRC', 'BID_STEP2_BSTORD_RQTY',
+               'BID_STEP3_BSTORD_PRC', 'BID_STEP3_BSTORD_RQTY', 'BID_STEP4_BSTORD_PRC', 'BID_STEP4_BSTORD_RQTY',
+               'BID_STEP5_BSTORD_PRC', 'BID_STEP5_BSTORD_RQTY',
+               '회원사주문시각', '매도총호가잔량', '매수총호가잔량',
+               '직전체결가격', '시가', '고가', '저가',
+               '시장구분코드', 'MKTSTAT_TP_CD', '매도10단계호가합계잔량',
+               '매수10단계호가합계잔량']
+pathdir = '/Data/ksqord/'
+envpathdir = pathdir + 'EnvData/'
 MBR_count_top=[50,  5,  3, 63, 12, 17,  4, 30, 56, 36,  2, 24,  8, 31, 25, 71, 21,
             58, 44,  1, 46, 45, 42, 10, 72, 68, 22, 33,  6, 37]
 MBRN_count_top=[( 5,   194),            (36,     1),
