@@ -23,7 +23,7 @@ env_columns = ['REGUL_OFFHR_TP_CD',
                '직전체결가격', '시가', '고가', '저가',
                '시장구분코드', 'MKTSTAT_TP_CD', '매도10단계호가합계잔량',
                '매수10단계호가합계잔량']
-pathdir = '/Data/ksqord/'
+pathdir = '/Data/ksqord1516/'
 envpathdir = pathdir + 'EnvData/'
 MBR_count_top=[50,  5,  3, 63, 12, 17,  4, 30, 56, 36,  2, 24,  8, 31, 25, 71, 21,
             58, 44,  1, 46, 45, 42, 10, 72, 68, 22, 33,  6, 37]

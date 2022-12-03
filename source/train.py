@@ -136,12 +136,12 @@ def train_epoch(model, optimizer, Xtrain_data, Ytrain_data, loss_fn, device, BAT
         optimizer.zero_grad()
 
         tgt_out = tgt[1:]
-        print("src in shape", src_input.shape)
-        print("tgt in shape", tgt_input.shape)
-        print("src shape", src_mask.shape)
-        print("tgt shape", tgt_mask.shape)
-        print("tgt output shape", tgt_out.shape)
-        print("logit shape", logits.shape)
+#         print("src in shape", src_input.shape)
+#         print("tgt in shape", tgt_input.shape)
+#         print("src shape", src_mask.shape)
+#         print("tgt shape", tgt_mask.shape)
+#         print("tgt output shape", tgt_out.shape)
+#         print("logit shape", logits.shape)
         loss = loss_fn(logits.reshape(-1, logits.shape[-1]), tgt_out.reshape(-1))
         loss.backward()
 
