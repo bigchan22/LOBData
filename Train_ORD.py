@@ -74,19 +74,23 @@ NUM_ENCODER_LAYERS = args.num_layers // 2
 NUM_DECODER_LAYERS = args.num_layers // 2
 NUM_LAYERS = args.num_layers
 mbrnlist = MBRN_sum_top
-mbrnlist =[(25,  1093),
-            (12,   100),
+mbrnlist =[(12,   100),
             (17,    29),
-            (44,     1),
-            (42,     1),
-            ( 2,   155),
             ( 2,    83),
             ( 4,  9997),
+            (50,    64),
             (56, 17990),
-            ( 5,   194)]
+            ( 5,   136),
+            (44,     1)]
+mbrnlist =[(12,   100),
+            (17,    29),
+            ( 2,    83),
+            ( 4,  9997),
+            (50,    64),
+            (56, 17990)]
 if args.mbr_no:
     mbrnlist = [(args.mbr_no, args.brn_no)]
-mbrnlist=[(42,1)]
+# mbrnlist=[(42,1)]
 print(mbrnlist)
 
 # load array
@@ -133,7 +137,7 @@ for mbr, brn in mbrnlist:
 
     Ytrain_data = Ytrain_data.view(-1)
     Ytest_data = Ytest_data.view(-1)
-
+    print(len(Ytest_data))
     torch.manual_seed(0)
 
     if device == None:

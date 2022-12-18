@@ -17,13 +17,21 @@ ISUlist_init=['KR7071930002',
  'KR7058820002',
  'KR7018700005',
  'KR7043200005']
-ISUlist_init=['KR7031860000', 'KR7215600008', 'KR7028040004', 'KR7030270003',
-       'KR7065450009', 'KR7068270008', 'KR7039670005', 'KR7043200005',
-       'KR7086520004', 'KR7203650007']
-MBR, BRN =42,1
+ISUlist_init=['KR7044180008', 'KR7024810004', 'KR7096040001', 'KR7036630002',
+       'KR7043100007', 'KR7049470008', 'USU652221081', 'KR7023430002',
+       'KR7017680000', 'KR7039790001']
+MBRNlist=[(12,   100),
+            (17,    29),
+            ( 2,    83),
+            ( 4,  9997),
+            (50,    64),
+            (56, 17990),
+            ( 5,   136),
+            (44,     1)]
+# MBR, BRN =42,1
 groupmin=10
 datasubfix="1111Train_08"
-PathDir = '/Data/ksqord1516/'
+PathDir = '/Data/ksqord15081510/'
 EnvPathDir=PathDir+'EnvData/'
 TrainPathDir='/Data/LOBData/TrainData/'
 
@@ -41,80 +49,78 @@ feat_cols=['매도5단계호가합계잔량', '매수5단계호가합계잔량',
 # feat_cols=['매도총호가잔량', '매수총호가잔량', '고가', '저가', 
 #            '직전체결가격','NET_ORD_QTY2']
 
+for MBR,BRN in MBRNlist:
+    TotDF=pd.DataFrame()
 
-TotDF=pd.DataFrame()
+    FileList=os.listdir(PathDir)
+    FileList.sort()
+    FileList= [ file for file in FileList if ".csv" in file ]
 
-FileList=os.listdir(PathDir)
-FileList.sort()
-FileList= [ file for file in FileList if ".csv" in file ]
+    for filename in FileList:
+        envfilename = filename[:-4]+"_10min_last.csv"
+        print(filename)
+        Data=pd.read_csv(os.path.join(PathDir,filename),names=header_df)
+        Data=append_ORD_TM(Data)
+        Data=append_ORD_VOL(Data)
+        Data=append_TM_GP(Data,groupmin=groupmin)
+        Data['NET_ORD_QTY']=Data['ORD_QTY']*(2*Data['ASKBID_TP_CD']-3)*(2-Data['MODCANCL_TP_CD'])
+        Data['NET_ORD_VOL']=Data['NET_ORD_QTY']*(Data['ORD_PRC'] + Data['직전체결가격']*(Data['ORD_PRC'] == 0))
 
-for filename in FileList:
-    envfilename = filename[:-4]+"_10min_last.csv"
-    print(filename)
-    Data=pd.read_csv(os.path.join(PathDir,filename),names=header_df)
-    Data=append_ORD_TM(Data)
-    Data=append_ORD_VOL(Data)
-    Data=append_TM_GP(Data,groupmin=groupmin)
-    Data['NET_ORD_QTY']=Data['ORD_QTY']*(2*Data['ASKBID_TP_CD']-3)*(2-Data['MODCANCL_TP_CD'])
-    Data['NET_ORD_VOL']=Data['NET_ORD_QTY']*(Data['ORD_PRC'] + Data['직전체결가격']*(Data['ORD_PRC'] == 0))
+        EnvData=pd.read_csv(EnvPathDir+envfilename)
+        ISU_list= [a for a in ISUlist_init  if a in EnvData.ISU_CD.unique() and a in Data.ISU_CD.unique() ]
+        print(ISU_list)
+        print(len(ISU_list))
+        if BRN is not None:
+            Data_MBRN=Data[(Data['MBR_NO']==MBR) & (Data['BRN_NO']==BRN)]
+        else:
+            Data_MBRN=Data[(Data['MBR_NO']==MBR)]
+        Data_MBRN=Data_MBRN[Data_MBRN['ISU_CD'].isin(ISU_list)]
 
-    EnvData=pd.read_csv(EnvPathDir+envfilename)
-    ISU_list= [a for a in ISUlist_init  if a in EnvData.ISU_CD.unique() and a in Data.ISU_CD.unique() ]
-    print(ISU_list)
-    print(len(ISU_list))
-    if BRN is not None:
-        Data_MBRN=Data[(Data['MBR_NO']==MBR) & (Data['BRN_NO']==BRN)]
-    else:
-        Data_MBRN=Data[(Data['MBR_NO']==MBR)]
-    Data_MBRN=Data_MBRN[Data_MBRN['ISU_CD'].isin(ISU_list)]
+        groupcolumns=['ORD_DD','ISU_CD','TM_GP']
+        sumcolumns=['NET_ORD_QTY','NET_ORD_VOL']
 
-    groupcolumns=['ORD_DD','ISU_CD','TM_GP']
-    sumcolumns=['NET_ORD_QTY','NET_ORD_VOL']
+        meancolumns=['ORD_PRC']
+        lastcolumns=[]
 
-    meancolumns=['ORD_PRC']
-    lastcolumns=[]
-
-    GDF=GetGroupDataFrame(Data_MBRN,groupcolumns,sumcolumns,meancolumns,lastcolumns)
-    GDF.set_index(['ORD_DD','ISU_CD', 'TM_GP'], inplace=True)
-    GDF = GDF.reindex(pd.MultiIndex.from_product([GDF.index.levels[0],GDF.index.levels[1],list(range(-9,55))]))
-    GDF = GDF.fillna(0)
-    GDF = GDF.reset_index()
-    GDF=GDF.rename(columns={'level_2': 'TM_GP'})
-
-
-    ISU_list= [a for a in GDF.ISU_CD.unique() if a in EnvData.ISU_CD.unique() ]
-    EnvData_MBRN=EnvData[EnvData['ISU_CD'].isin(ISU_list)]
-
-    TrainData = pd.concat([GDF.set_index(['ORD_DD','ISU_CD', 'TM_GP']),EnvData_MBRN.set_index(['ORD_DD','ISU_CD', 'TM_GP'])],axis=1)
-    TrainData=TrainData.reset_index()
-    TrainData=append_STEP5(TrainData)
-    TrainData['10단계호가합계잔량']=TrainData['매수10단계호가합계잔량']+TrainData['매도10단계호가합계잔량']
-    TrainData["NET_ORD_QTY2"]=(TrainData["NET_ORD_QTY"]>0).replace({True: 1, False: 0})+(TrainData["NET_ORD_QTY"]<0).replace({True: 0, False: 1})
-
-    Train_df=TrainData[(TrainData['TM_GP']>=0) & (TrainData['TM_GP']<39)]
+        GDF=GetGroupDataFrame(Data_MBRN,groupcolumns,sumcolumns,meancolumns,lastcolumns)
+        GDF.set_index(['ORD_DD','ISU_CD', 'TM_GP'], inplace=True)
+        GDF = GDF.reindex(pd.MultiIndex.from_product([GDF.index.levels[0],GDF.index.levels[1],list(range(-9,55))]))
+        GDF = GDF.fillna(0)
+        GDF = GDF.reset_index()
+        GDF=GDF.rename(columns={'level_2': 'TM_GP'})
 
 
+        ISU_list= [a for a in GDF.ISU_CD.unique() if a in EnvData.ISU_CD.unique() ]
+        EnvData_MBRN=EnvData[EnvData['ISU_CD'].isin(ISU_list)]
 
-    divdict={}
-    loglist=[]
-    loglist+=['고가','저가','직전체결가격']
-    minmaxnormlist=[]
-    minmaxnormlist+=['매도총호가잔량', '매수총호가잔량', '고가', '저가', 
-               '직전체결가격']
+        TrainData = pd.concat([GDF.set_index(['ORD_DD','ISU_CD', 'TM_GP']),EnvData_MBRN.set_index(['ORD_DD','ISU_CD', 'TM_GP'])],axis=1)
+        TrainData=TrainData.reset_index()
+        TrainData=append_STEP5(TrainData)
+        TrainData['10단계호가합계잔량']=TrainData['매수10단계호가합계잔량']+TrainData['매도10단계호가합계잔량']
+        TrainData["NET_ORD_QTY2"]=(TrainData["NET_ORD_QTY"]>0).replace({True: 1, False: 0})+(TrainData["NET_ORD_QTY"]<0).replace({True: 0, False: 1})
 
-    for divcol in divdict:
-        Train_df[divdict[divcol]]=Train_df[divdict[divcol]].div(Train_df[divcol],axis=0).values
-    Train_df[loglist]=np.log(Train_df[loglist])
-    Train_df[minmaxnormlist]=(Train_df[minmaxnormlist]-Train_df[minmaxnormlist].min())/(Train_df[minmaxnormlist].max()\
-                                                                                        -Train_df[minmaxnormlist].min())
-    TotDF=TotDF.append(Train_df[feat_cols])
-TotDF['y']=TotDF['NET_ORD_QTY2'].shift(-1).fillna(1)
-TotDF['y'][38::39]=1
-TrainData[["NET_ORD_QTY","NET_ORD_QTY2"]]
-DataSubfix = str(MBR) + '_' + str(BRN) + datasubfix
-XDataname = 'Train_ORD' + '_' + DataSubfix + '.npy'
-YDataname = 'Train_ORD_Label_' + '_' + DataSubfix + '.npy'
-np.save(TrainPathDir+XDataname,TotDF[feat_cols[:]].values.astype('float64'))
-np.save(TrainPathDir+YDataname,TotDF['y'].values)
-print("path:",TrainPathDir+XDataname)
-print("path:",TrainPathDir+YDataname)
+        Train_df=TrainData[(TrainData['TM_GP']>=0) & (TrainData['TM_GP']<39)]
+
+        divdict={}
+        loglist=[]
+        loglist+=['고가','저가','직전체결가격']
+        minmaxnormlist=[]
+        minmaxnormlist+=['매도총호가잔량', '매수총호가잔량', '고가', '저가', 
+                   '직전체결가격']
+
+        for divcol in divdict:
+            Train_df[divdict[divcol]]=Train_df[divdict[divcol]].div(Train_df[divcol],axis=0).values
+        Train_df[loglist]=np.log(Train_df[loglist])
+        Train_df[minmaxnormlist]=(Train_df[minmaxnormlist]-Train_df[minmaxnormlist].min())/(Train_df[minmaxnormlist].max()\
+                                                                                            -Train_df[minmaxnormlist].min())
+        TotDF=TotDF.append(Train_df[feat_cols])
+    TotDF['y']=TotDF['NET_ORD_QTY2'].shift(-1).fillna(1)
+    TotDF['y'][38::39]=1
+    TrainData[["NET_ORD_QTY","NET_ORD_QTY2"]]
+    DataSubfix = str(MBR) + '_' + str(BRN) + datasubfix
+    XDataname = 'Train_ORD' + '_' + DataSubfix + '.npy'
+    YDataname = 'Train_ORD_Label_' + '_' + DataSubfix + '.npy'
+    np.save(TrainPathDir+XDataname,TotDF[feat_cols[:]].values.astype('float64'))
+    np.save(TrainPathDir+YDataname,TotDF['y'].values)
+    print("path:",TrainPathDir+XDataname)
+    print("path:",TrainPathDir+YDataname)
