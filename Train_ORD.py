@@ -114,11 +114,9 @@ for mbr, brn in mbrnlist:
             print(XDataname)
             print(XData[39 * idx:39 * (idx + 1)][:, :].tolist())
             raise RuntimeError
-            continue
         if np.isinf(YData[39 * idx:39 * (idx + 1)][:].tolist()).any():
             print(np.isinf(YData[39 * idx:39 * (idx + 1)].tolist()).any())
             raise RuntimeError
-            continue
         if idx < (len(XData) // 39) * 0.9:
             Xtrain_data.append(XData[39 * idx:39 * (idx + 1)][:, :-1].tolist())
             Ytrain_data.append(YData[39 * idx:39 * (idx + 1)].tolist())
