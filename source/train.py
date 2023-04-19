@@ -492,6 +492,7 @@ def evaluate_lstm(model, Xtest_data, Ytest_data, loss_fn, device, BATCH_SIZE, bp
     with torch.no_grad():
 
         i = 0
+        print("########",Xtest_data.size(0))
         while (i < Xtest_data.size(0)):
             data, org_targets = get_batch(Xtest_data, i, BATCH_SIZE, bptt)
             if (data.isnan().any() or data.isinf().any()):
@@ -502,8 +503,9 @@ def evaluate_lstm(model, Xtest_data, Ytest_data, loss_fn, device, BATCH_SIZE, bp
             src = batchify(data, BATCH_SIZE, bptt, device)
             tgt = batchify(targets, BATCH_SIZE, bptt, device)
             #             print(src.shape)
-            if (src.shape[1] != BATCH_SIZE):
-                break
+            # if (src.shape[1] != BATCH_SIZE):
+            #     print(src.shape, BATCH_SIZE)
+            #     break
             #             print(tgt.shape)
             #            src=src[:-1]
             #            tgt=tgt[1:]
@@ -517,7 +519,7 @@ def evaluate_lstm(model, Xtest_data, Ytest_data, loss_fn, device, BATCH_SIZE, bp
                 break
             losses += loss.item()
             _, predicted = torch.max(logits, -1)
-
+            print(predicted)
             correct += (tgt.squeeze() == predicted).sum().item()
             total += len(predicted) * BATCH_SIZE
             tot0 += (0 == tgt.squeeze()).sum().item()

@@ -88,6 +88,27 @@ mbrnlist =[(12,   100),
             ( 4,  9997),
             (50,    64),
             (56, 17990)]
+mbrnlist=[(50,None),####0307Trainset2
+(5,None),
+(2,None),
+(12,None),
+(3,None),
+(36,None),
+(17,None),
+(4,None),
+(63,None),
+(56,None)]
+
+mbrnlist=[(50,None),#######0307Trainset
+(5,None),
+(2,None),
+(36,None),
+(3,None),
+(12,None),
+(63,None),
+(17,None),
+(4,None),
+(30,None)]
 if args.mbr_no:
     mbrnlist = [(args.mbr_no, args.brn_no)]
 # mbrnlist=[(42,1)]
