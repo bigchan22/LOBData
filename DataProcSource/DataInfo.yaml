@@ -1,0 +1,85 @@
+groupmin: 10
+PathDir: /Data/ksqord_0307/
+EnvPathDir: /Data/ksqord_0307/EnvData/
+TrainPathDir: /Data/LOBData/TrainData/
+datasubfix: "0420Trainset"
+envdataoption: "last"
+envdatasubfix: "10min_last"
+CancelCount: True
+ISUlist:
+  - KR7044180008
+  - KR7024810004
+  - KR7096040001
+  - KR7036630002
+  - KR7043100007
+  - KR7049470008
+  - USU652221081
+  - KR7023430002
+  - KR7017680000
+  - KR7039790001
+MBRNlist:
+  - - 50
+    - null
+  - - 5
+    - null
+  - - 2
+    - null
+  - - 12
+    - null
+  - - 3
+    - null
+  - - 36
+    - null
+  - - 17
+    - null
+  - - 4
+    - null
+  - - 63
+    - null
+  - - 56
+    - null
+header_df: ['ISU_CD', 'ORD_DD', 'ORD_ACPT_NO', 'REGUL_OFFHR_TP_CD', 'BLKTRD_TP_CD', '호가장처리가격',
+             'ASKBID_TP_CD', 'MODCANCL_TP_CD', 'ORD_TP_CD', 'ORD_COND_CD', 'INVST_TP_CD', 'ASK_STEP1_BSTORD_PRC',
+             'ASK_STEP1_BSTORD_RQTY', 'ASK_STEP2_BSTORD_PRC', 'ASK_STEP2_BSTORD_RQTY', 'ASK_STEP3_BSTORD_PRC',
+             'ASK_STEP3_BSTORD_RQTY', 'ASK_STEP4_BSTORD_PRC', 'ASK_STEP4_BSTORD_RQTY', 'ASK_STEP5_BSTORD_PRC',
+             'ASK_STEP5_BSTORD_RQTY',
+             'BID_STEP1_BSTORD_PRC', 'BID_STEP1_BSTORD_RQTY', 'BID_STEP2_BSTORD_PRC', 'BID_STEP2_BSTORD_RQTY',
+             'BID_STEP3_BSTORD_PRC', 'BID_STEP3_BSTORD_RQTY', 'BID_STEP4_BSTORD_PRC', 'BID_STEP4_BSTORD_RQTY',
+             'BID_STEP5_BSTORD_PRC', 'BID_STEP5_BSTORD_RQTY', 'ORD_ACPT_TM', 'ORD_QTY', 'ORD_PRC',
+             '호가우선순위번호', 'MBR_NO', 'BRN_NO', 'CNTR_CD', 'TRST_PRINC_TP_CD', 'FORNINVST_TP_CD',
+             'ORD_MEDIA_TP_CD', '회원사주문시각', '예상체결가격', '예상체결수량', '매도총호가잔량', '매수총호가잔량',
+             '호가체결접수순서번호', '직전체결가격', '누적체결수량', '누적거래대금', 'AGG_TM', '시가', '고가', '저가',
+             'ORGN_ORD_ACPT_NO', '시장구분코드', '자동취소처리구분코드', 'MKTSTAT_TP_CD', '매도10단계호가합계잔량',
+             '매수10단계호가합계잔량', 'PT_TP_CD']# List of header_df values
+env_columns: ['REGUL_OFFHR_TP_CD',
+               'ASK_STEP1_BSTORD_PRC',
+               'ASK_STEP1_BSTORD_RQTY', 'ASK_STEP2_BSTORD_PRC', 'ASK_STEP2_BSTORD_RQTY', 'ASK_STEP3_BSTORD_PRC',
+               'ASK_STEP3_BSTORD_RQTY', 'ASK_STEP4_BSTORD_PRC', 'ASK_STEP4_BSTORD_RQTY', 'ASK_STEP5_BSTORD_PRC',
+               'ASK_STEP5_BSTORD_RQTY',
+               'BID_STEP1_BSTORD_PRC', 'BID_STEP1_BSTORD_RQTY', 'BID_STEP2_BSTORD_PRC', 'BID_STEP2_BSTORD_RQTY',
+               'BID_STEP3_BSTORD_PRC', 'BID_STEP3_BSTORD_RQTY', 'BID_STEP4_BSTORD_PRC', 'BID_STEP4_BSTORD_RQTY',
+               'BID_STEP5_BSTORD_PRC', 'BID_STEP5_BSTORD_RQTY',
+               '회원사주문시각', '매도총호가잔량', '매수총호가잔량',
+               '직전체결가격', '시가', '고가', '저가',
+               '시장구분코드', 'MKTSTAT_TP_CD', '매도10단계호가합계잔량',
+               '매수10단계호가합계잔량'] # List of env_columns values
+ord_columns: ['ISU_CD', 'ORD_DD', 'ORD_ACPT_NO', 'BLKTRD_TP_CD', '호가장처리가격', 'ASKBID_TP_CD', 'MODCANCL_TP_CD',
+               'ORD_TP_CD', 'ORD_COND_CD', 'INVST_TP_CD', 'ORD_ACPT_TM', 'ORD_QTY', 'ORD_PRC', '호가우선순위번호', 'MBR_NO',
+               'BRN_NO',
+               'CNTR_CD', 'TRST_PRINC_TP_CD', 'FORNINVST_TP_CD', 'ORD_MEDIA_TP_CD', '예상체결가격', '예상체결수량', '호가체결접수순서번호',
+               '누적체결수량', '누적거래대금', 'AGG_TM', 'ORGN_ORD_ACPT_NO', '자동취소처리구분코드', 'PT_TP_CD'] # List of ord_columns values
+feat_cols: [   'ASK_STEP1_BSTORD_RQTY', 'ASK_STEP2_BSTORD_RQTY',
+               'ASK_STEP3_BSTORD_RQTY', 'ASK_STEP4_BSTORD_RQTY',
+               'ASK_STEP5_BSTORD_RQTY',
+               'BID_STEP1_BSTORD_RQTY', 'BID_STEP2_BSTORD_RQTY',
+               'BID_STEP3_BSTORD_RQTY', 'BID_STEP4_BSTORD_RQTY',
+               'BID_STEP5_BSTORD_RQTY','매도5단계호가합계잔량', '매수5단계호가합계잔량', '매도10단계호가합계잔량',
+             '매수10단계호가합계잔량', '매도총호가잔량', '매수총호가잔량', '고가', '저가',
+             '시가', '직전체결가격', 'NEW_ASK_QTY','CCL_ASK_QTY','NEW_BID_QTY','CCL_BID_QTY','NET_ORD_QTY2'] # List of feat_cols values
+groupcolumns: ['ORD_DD', 'ISU_CD', 'TM_GP']
+sumcolumns: ['NET_ORD_QTY', 'NET_ORD_VOL','NEW_ASK_QTY','CCL_ASK_QTY','NEW_BID_QTY','CCL_BID_QTY']
+meancolumns: ['ORD_PRC']
+lastcolumns: []
+divdict: {}
+loglist: ['고가', '저가', '직전체결가격']
+minmaxnormlist: ['매도총호가잔량', '매수총호가잔량', '고가', '저가', '직전체결가격']
