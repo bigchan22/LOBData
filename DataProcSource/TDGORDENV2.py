@@ -27,18 +27,24 @@ groupcolumns = config['groupcolumns']
 sumcolumns = config['sumcolumns']
 meancolumns = config['meancolumns']
 lastcolumns = config['lastcolumns']
+ycols = config['ycols']
+dir_path = os.path.join(TrainPathDir, datasubfix)
 
 columns = header_df
 
 
-def process_files(file_list):
+def calculate_qty(data, askbid, cancl):
+    return data['ORD_QTY'] * (data['ASKBID_TP_CD'] == askbid) * (cancl == data['MODCANCL_TP_CD'])
+
+
+def process_files(file_list, MBR, BRN):
     tot_df = pd.DataFrame()
     for filename in file_list:
         data, env_data = read_data_files(filename)
-        processed_data = preprocess_data(data, env_data)
+        processed_data = preprocess_data(data, env_data, MBR, BRN)
         train_df = prepare_train_data(processed_data, env_data)
-        tot_df += train_df[feat_cols]
-
+        # tot_df += train_df[feat_cols]
+        tot_df = pd.concat([tot_df, train_df[feat_cols]], axis=0, ignore_index=True)
     return tot_df
 
 
@@ -50,7 +56,7 @@ def read_data_files(filename):
     return data, env_data
 
 
-def preprocess_data(data, env_data):
+def preprocess_data(data, env_data, MBR, BRN):
     ISU_list = [a for a in ISUlist if a in env_data.ISU_CD.unique() and a in data.ISU_CD.unique()]
     if BRN is not None:
         data = data[(data['MBR_NO'] == MBR) & (data['BRN_NO'] == BRN)]
@@ -62,12 +68,14 @@ def preprocess_data(data, env_data):
     data = append_ORD_VOL(data)
     data = append_TM_GP(data, groupmin=groupmin)
     data['NEW_ASK_QTY'] = data['ORD_QTY'] * (data['ASKBID_TP_CD'] == 1) * (1 == data['MODCANCL_TP_CD'])
-    data['CCL_ASK_QTY'] = data['ORD_QTY'] * (data['ASKBID_TP_CD'] == 1) * (3 == data['MODCANCL_TP_CD'])
-    data['NEW_BID_QTY'] = data['ORD_QTY'] * (data['ASKBID_TP_CD'] == 2) * (1 == data['MODCANCL_TP_CD'])
-    data['CCL_BID_QTY'] = data['ORD_QTY'] * (data['ASKBID_TP_CD'] == 2) * (3 == data['MODCANCL_TP_CD'])
-    data['NET_ASK_QTY'] = data['NEW_ASK_QTY'] - data['CCL_ASK_QTY']
-    data['NET_BID_QTY'] = data['NEW_BID_QTY'] - data['CCL_BID_QTY']
-    data['NET_ORD_QTY'] = data['ORD_QTY'] * (2 * data['ASKBID_TP_CD'] - 3) * (2 - data['MODCANCL_TP_CD'])
+    data['NEW_ASK_QTY'] = calculate_qty(data, 1, 1)
+    data['CCL_ASK_QTY'] = calculate_qty(data, 1, 3)
+    data['NEW_BID_QTY'] = calculate_qty(data, 2, 1)
+    data['CCL_BID_QTY'] = calculate_qty(data, 2, 3)
+    # data['NET_ASK_QTY'] = data['NEW_ASK_QTY'] - data['CCL_ASK_QTY']
+    # data['NET_BID_QTY'] = data['NEW_BID_QTY'] - data['CCL_BID_QTY']
+    # data['NET_ORD_QTY'] = data['ORD_QTY'] * (2 * data['ASKBID_TP_CD'] - 3) * (2 - data['MODCANCL_TP_CD'])
+    data['NET_ORD_QTY'] = data['NEW_BID_QTY'] - data['NEW_ASK_QTY'] - (data['CCL_BID_QTY'] - data['CCL_ASK_QTY'])
     data['NET_ORD_VOL'] = data['NET_ORD_QTY'] * (data['ORD_PRC'] + data['직전체결가격'] * (data['ORD_PRC'] == 0))
 
     GDF = GetGroupDataFrame(data, groupcolumns, sumcolumns, meancolumns, lastcolumns)
@@ -101,22 +109,58 @@ def prepare_train_data(processed_data, env_data):
     return Train_df
 
 
+# def save_data(tot_df, mbr, brn):
+#     data_subfix = f"{mbr}_{brn}{datasubfix}"
+#     x_data_name = f'Train_ORD_{data_subfix}.npy'
+#     y_data_name = f'Train_ORD_Label_{data_subfix}.npy'
+#     x_data_path = os.path.join(TrainPathDir, x_data_name)
+#     y_data_path = os.path.join(TrainPathDir, y_data_name)
+#     np.save(x_data_path, tot_df[feat_cols[:]].values.astype('float64'))
+#     np.save(y_data_path, tot_df['y'].values)
+#     print("path:", x_data_path)
+#     print("path:", y_data_path)
+
+
 def save_data(tot_df, mbr, brn):
-    data_subfix = f"{mbr}_{brn}{datasubfix}"
-    x_data_name = f'Train_ORD_{data_subfix}.npy'
-    y_data_name = f'Train_ORD_Label_{data_subfix}.npy'
-    x_data_path = os.path.join(TrainPathDir, x_data_name)
-    y_data_path = os.path.join(TrainPathDir, y_data_name)
+    # set the suffix for the data filenames
+    # data_subfix = f"{mbr}_{brn}{datasubfix}"
+
+    # create the directory if it doesn't exist
+
+    if not os.path.exists(dir_path):
+        os.makedirs(dir_path)
+    mbrn_subfix = f"{mbr}_{brn}"
+    # set the filenames for the data files
+    x_data_name = f'Input_{mbrn_subfix}.npy'
+    y_data_name = f'Label_{mbrn_subfix}.npy'
+
+    # set the full paths for the data files
+    x_data_path = os.path.join(dir_path, x_data_name)
+    y_data_path = os.path.join(dir_path, y_data_name)
+
+    # save the data files
     np.save(x_data_path, tot_df[feat_cols[:]].values.astype('float64'))
-    np.save(y_data_path, tot_df['y'].values)
+    np.save(y_data_path, tot_df[ycols].values)
+
+    # print the paths to the saved data files
     print("path:", x_data_path)
     print("path:", y_data_path)
 
 
-for MBR, BRN in MBRNlist:
-    print(MBR, BRN)
-    file_list = sorted([file for file in os.listdir(PathDir) if ".csv" in file])
-    tot_df = process_files(file_list)
-    tot_df['y'] = tot_df['NET_ORD_QTY2'].shift(-1).fillna(1)
-    tot_df['y'][38::39] = 1
-    save_data(tot_df, MBR, BRN)
+def main():
+    for MBR, BRN in MBRNlist:
+        print(MBR, BRN)
+        file_list = sorted([file for file in os.listdir(PathDir) if ".csv" in file])
+        tot_df = process_files(file_list, MBR, BRN)
+        save_data(tot_df, MBR, BRN)
+
+    config_filename = 'config.yaml'
+    config_path = os.path.join(dir_path, config_filename)
+
+    # write the config dictionary to the config file
+    with open(config_path, 'w') as file:
+        yaml.dump(config, file)
+
+
+if __name__ == "__main__":
+    main()

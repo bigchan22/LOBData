@@ -1,0 +1,13 @@
+model: "Trans"
+epoch: 1000
+batch_size: 128
+lr_initial: 0.001
+hid_dim: 128
+emb_dim: 128
+num_layers: 4
+num_head: 8
+mbr_no: null
+brn_no: null
+data: "0426Trainset"
+trainname: "0426_Train"
+device: "cuda:0"

@@ -2,7 +2,7 @@ groupmin: 10
 PathDir: /Data/ksqord_0307/
 EnvPathDir: /Data/ksqord_0307/EnvData/
 TrainPathDir: /Data/LOBData/TrainData/
-datasubfix: "0420Trainset"
+datasubfix: "0426Trainset"
 envdataoption: "last"
 envdatasubfix: "10min_last"
 CancelCount: True
@@ -38,6 +38,7 @@ MBRNlist:
     - null
   - - 56
     - null
+ycols: ['NEW_BID_QTY', 'NEW_ASK_QTY', 'CCL_BID_QTY', 'CCL_ASK_QTY']
 header_df: ['ISU_CD', 'ORD_DD', 'ORD_ACPT_NO', 'REGUL_OFFHR_TP_CD', 'BLKTRD_TP_CD', '호가장처리가격',
              'ASKBID_TP_CD', 'MODCANCL_TP_CD', 'ORD_TP_CD', 'ORD_COND_CD', 'INVST_TP_CD', 'ASK_STEP1_BSTORD_PRC',
              'ASK_STEP1_BSTORD_RQTY', 'ASK_STEP2_BSTORD_PRC', 'ASK_STEP2_BSTORD_RQTY', 'ASK_STEP3_BSTORD_PRC',
@@ -75,11 +76,17 @@ feat_cols: [   'ASK_STEP1_BSTORD_RQTY', 'ASK_STEP2_BSTORD_RQTY',
                'BID_STEP3_BSTORD_RQTY', 'BID_STEP4_BSTORD_RQTY',
                'BID_STEP5_BSTORD_RQTY','매도5단계호가합계잔량', '매수5단계호가합계잔량', '매도10단계호가합계잔량',
              '매수10단계호가합계잔량', '매도총호가잔량', '매수총호가잔량', '고가', '저가',
-             '시가', '직전체결가격', 'NEW_ASK_QTY','CCL_ASK_QTY','NEW_BID_QTY','CCL_BID_QTY','NET_ORD_QTY2'] # List of feat_cols values
+             '시가', '직전체결가격', 'NEW_ASK_QTY','CCL_ASK_QTY','NEW_BID_QTY','CCL_BID_QTY'] # List of feat_cols values
 groupcolumns: ['ORD_DD', 'ISU_CD', 'TM_GP']
 sumcolumns: ['NET_ORD_QTY', 'NET_ORD_VOL','NEW_ASK_QTY','CCL_ASK_QTY','NEW_BID_QTY','CCL_BID_QTY']
 meancolumns: ['ORD_PRC']
 lastcolumns: []
 divdict: {}
 loglist: ['고가', '저가', '직전체결가격']
-minmaxnormlist: ['매도총호가잔량', '매수총호가잔량', '고가', '저가', '직전체결가격']
+minmaxnormlist: ['ASK_STEP1_BSTORD_RQTY', 'ASK_STEP2_BSTORD_RQTY',
+               'ASK_STEP3_BSTORD_RQTY', 'ASK_STEP4_BSTORD_RQTY',
+               'ASK_STEP5_BSTORD_RQTY',
+               'BID_STEP1_BSTORD_RQTY', 'BID_STEP2_BSTORD_RQTY',
+               'BID_STEP3_BSTORD_RQTY', 'BID_STEP4_BSTORD_RQTY',
+               'BID_STEP5_BSTORD_RQTY','매도5단계호가합계잔량', '매수5단계호가합계잔량', '매도10단계호가합계잔량',
+             '매수10단계호가합계잔량','매도총호가잔량', '매수총호가잔량', '고가', '저가', '직전체결가격']
